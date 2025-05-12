@@ -6,7 +6,6 @@
         </div>
     </section>
 
-
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-16 mb-10">
         <Trend color="green" title="Income" :amount="incomeTotal" :last-amount="3000" :loading="isLoading" />
         <Trend color="red" title="Expense" :amount="expenseTotal" :last-amount="5000" :loading="isLoading" />
@@ -22,7 +21,8 @@
             </div>
         </div>
         <div>
-            <UButton icon="i-lucide-plus-circle" color="white" variant="solid" label="Add" />
+            <TransactionModal v-model="isOpen" />
+            <UButton icon="i-lucide-plus-circle" color="white" variant="solid" label="Add" @click="isOpen = true" />
         </div>
     </section>
 
@@ -49,6 +49,7 @@ const selectedView = ref(transactionViewOptions[1])
 const supabase = useSupabaseClient();
 const transactions = ref([])
 const isLoading = ref(false)
+const isOpen = ref(false)
 const income = computed(
     () => transactions.value.filter(t => t.type === 'Income')
 )
@@ -56,13 +57,15 @@ const expense = computed(
     () => transactions.value.filter(t => t.type === 'Expense')
 )
 
+
+
 const incomeCount = computed(() => income.value.length)
 const expenseCount = computed(() => expense.value.length)
 
-const incomeTotal = computed (
+const incomeTotal = computed(
     () => income.value.reduce((sum, transaction) => sum + transaction.amount, 0)
 )
-const expenseTotal = computed (
+const expenseTotal = computed(
     () => expense.value.reduce((sum, transaction) => sum + transaction.amount, 0)
 )
 
