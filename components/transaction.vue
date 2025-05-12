@@ -15,7 +15,8 @@
       <div>{{ currency }}</div>
       <div>
         <UDropdownMenu :items="items">
-          <UButton color="neutral" variant="ghost" trailing-icon="i-heroicons-ellipsis-horizontal" />
+          <UButton color="neutral" variant="ghost" trailing-icon="i-heroicons-ellipsis-horizontal"
+            :loading="isLoading" />
         </UDropdownMenu>
       </div>
     </div>
@@ -30,8 +31,11 @@ const props = defineProps<{
     category?: string;
     type: string;
     amount: number;
+    id: number;
   };
 }>();
+
+const emit = defineEmits(['deleted'])
 
 const isIncome = computed(() => props.transaction.type === 'Income')
 
@@ -45,25 +49,49 @@ const iconColor = computed(
 
 const { currency } = useCurrency(props.transaction.amount)
 
+const isLoading = ref(false)
+const toast = useToast()
+const supabase = useSupabaseClient()
+
+const deleteTransaction = async () => {
+  isLoading.value = true
+
+  try {
+    await supabase.from('transactions')
+      .delete()
+      .eq('id', props.transaction.id)
+    toast.add({
+      title: 'Transaction deleted',
+      icon: 'i-lucide-circle',
+      color: 'primary'
+    })
+    emit('deleted', props.transaction.id)
+  } catch (error) {
+    toast.add({
+      title: 'Transaction deleted',
+      icon: 'i-lucide-circle',
+      color: 'error'
+    })
+
+  } finally {
+    isLoading.value = false
+  }
+}
+
 
 const items = ref<DropdownMenuItem[][]>([
   [
     {
-      label: 'Profile',
-      icon: 'i-lucide-user',
-      onSelect() {
-        console.log('Invite by email clicked')
-      }
+      label: 'Edit',
+      icon: 'i-lucide-edit',
+
     },
     {
-      label: 'Settings',
-      icon: 'i-lucide-cog'
-    }
-  ],
-  [
-    {
-      label: 'Logout',
-      icon: 'i-lucide-log-out'
+      label: 'Delete',
+      icon: 'i-lucide-delete',
+      onSelect() {
+        deleteTransaction()
+      }
     }
   ]
 ])
