@@ -2,9 +2,6 @@ export const useUseFetchTransaction = (period) => {
     const supabase = useSupabaseClient();
     const transactions = ref([])
     const pending = ref(false)
-
-
-
     const income = computed(
         () => (transactions.value || []).filter(t => t.type === 'Income')
     )
@@ -46,7 +43,7 @@ export const useUseFetchTransaction = (period) => {
     const refresh = async () => {
         transactions.value = await fetchTransactions()
     }
-    watch(period, refresh, { immediate: true })
+    watch(period, async() => await refresh())
     const transactionsGroupedByDate = computed(() => {
         let grouped = {}
 
@@ -59,7 +56,6 @@ export const useUseFetchTransaction = (period) => {
         }
         return grouped
     })
-
 
     return {
         transaction: {

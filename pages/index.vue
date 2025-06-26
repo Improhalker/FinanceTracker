@@ -61,11 +61,13 @@ const {pending, refresh, transaction: {
     }
 }} = useUseFetchTransaction(current)
 
-const {transactions: {
+await refresh()
+
+const {refresh: refreshPrevious, transactions: {
     incomeTotal: prevIncomeTotal,
     expenseTotal: prevExpenseTotal
 } = {}} = useUseFetchTransaction(previous)
-
+await refreshPrevious()
 
 await refresh()
 
