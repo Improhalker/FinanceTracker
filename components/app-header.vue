@@ -9,3 +9,20 @@
       </div>
     </header>
 </template>
+
+<script setup>
+
+import { useRouter } from 'vue-router'
+const user = useSupabaseUser()
+const router = useRouter()
+watch(user, (user) => {
+  if(user) {
+    console.log('Signed in!')
+  } else {
+    console.log('Not logged')
+    router.push('/login')
+    
+  }
+}, {immediate: true})
+
+</script>
